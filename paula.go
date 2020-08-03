@@ -4,11 +4,14 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"sync"
 	"syscall"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -49,9 +52,18 @@ func setWhatis(name string, message string) {
 		return
 	}
 
-	fmt.Println(" who: " + name + " what: " + splitted[0] + " what: " + splitted[1])
+	fmt.Println(splitted[0] + " -> " + splitted[1] + "(" + name + ")")
 	whatisDb = append(whatisDb, whatIs{name, splitted[0], splitted[1]})
 
+}
+
+func randWhatis() whatIs {
+	mutex.Lock()
+	defer mutex.Unlock()
+	size := len(whatisDb)
+
+	fmt.Println("size:" + strconv.Itoa(size))
+	return whatisDb[rand.Intn(len(whatisDb))]
 }
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -73,11 +85,17 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 	cmd := splitted[0]
-	rest := splitted[1]
+	var rest string
+
+	if len(splitted) > 1 {
+		rest = splitted[1]
+	}
 
 	// If the message is "ping" reply with "Pong!"
 	if cmd == "!randwhatis" {
-		s.ChannelMessageSend(m.ChannelID, "Pong!")
+		whatis := randWhatis()
+
+		s.ChannelMessageSend(m.ChannelID, whatis.what+" -> "+whatis.entry+"("+whatis.who+")")
 	}
 
 	// If the message is "pong" reply with "Ping!"
@@ -89,6 +107,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 func main() {
+	rand.Seed(time.Now().Unix())
 	discordKey := readkey("../../../discord/paula.key")
 
 	dg, err := discordgo.New("Bot " + discordKey)
