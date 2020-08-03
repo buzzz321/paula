@@ -43,7 +43,7 @@ func readkey(filename string) string {
 	return key
 }
 
-func setWhatis(name string, message string) {
+func setWhatIs(name string, message string) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
@@ -57,7 +57,17 @@ func setWhatis(name string, message string) {
 
 }
 
-func randWhatis() whatIs {
+func getWhatIs(what string) (whatIs, int) {
+	for index, item := range whatisDb {
+		if item.what == what {
+			return item, index
+		}
+	}
+
+	return whatIs{"", "", ""}, -1
+}
+
+func randWhatIs() whatIs {
 	mutex.Lock()
 	defer mutex.Unlock()
 	size := len(whatisDb)
@@ -91,18 +101,27 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		rest = splitted[1]
 	}
 
-	// If the message is "ping" reply with "Pong!"
 	if cmd == "!randwhatis" {
-		whatis := randWhatis()
+		whatis := randWhatIs()
 
 		s.ChannelMessageSend(m.ChannelID, whatis.what+" -> "+whatis.entry+"("+whatis.who+")")
 	}
 
-	// If the message is "pong" reply with "Ping!"
 	if cmd == "!setwhatis" {
-		setWhatis(m.Author.Username, rest)
+		setWhatIs(m.Author.Username, rest)
 
 		s.ChannelMessageSend(m.ChannelID, "Ping!")
+	}
+
+	if cmd == "!whatis" {
+		whatis, index := getWhatIs(rest)
+
+		if index == -1 {
+			return
+		}
+
+		s.ChannelMessageSend(m.ChannelID, whatis.what+" -> "+whatis.entry+"("+whatis.who+")")
+
 	}
 }
 
