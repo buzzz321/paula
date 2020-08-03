@@ -15,6 +15,7 @@ import (
 
 type whatIs struct {
 	who   string
+	what  string
 	entry string
 }
 
@@ -43,8 +44,13 @@ func setWhatis(name string, message string) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	fmt.Println(name + " " + message)
-	whatisDb = append(whatisDb, whatIs{name, message})
+	splitted := strings.SplitN(message, " ", 2)
+	if len(splitted) < 2 {
+		return
+	}
+
+	fmt.Println(" who: " + name + " what: " + splitted[0] + " what: " + splitted[1])
+	whatisDb = append(whatisDb, whatIs{name, splitted[0], splitted[1]})
 
 }
 
@@ -69,7 +75,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	cmd := splitted[0]
 	rest := splitted[1]
 
-	fmt.Println("saldjasdlkasj")
 	// If the message is "ping" reply with "Pong!"
 	if cmd == "!randwhatis" {
 		s.ChannelMessageSend(m.ChannelID, "Pong!")
