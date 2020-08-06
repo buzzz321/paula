@@ -125,6 +125,32 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 }
 
+func readWhatis() {
+	inputFile, err := os.Open("whatisdb.txt")
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	defer inputFile.Close()
+
+	scanner := bufio.NewScanner(inputFile)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+
+		if err := scanner.Err(); err != nil {
+			fmt.Fprintln(os.Stderr, "reading standard input:", err)
+		}
+
+		whatisPart := strings.Split(line, ";")
+		if len(whatisPart) == 4 {
+			fmt.Println(line)
+			whatisDb = append(whatisDb, whatIs{whatisPart[0], whatisPart[2], whatisPart[3]})
+		}
+	}
+
+}
+
 func main() {
 	rand.Seed(time.Now().Unix())
 	discordKey := readkey("../../../discord/paula.key")
@@ -145,6 +171,7 @@ func main() {
 		return
 	}
 
+	readWhatis()
 	// Wait here until CTRL-C or other term signal is received.
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
