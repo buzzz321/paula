@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/microcosm-cc/bluemonday"
 )
 
 type whatIs struct {
@@ -86,8 +87,12 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Content[0] != '!' {
 		return
 	}
+	sanitizer := bluemonday.StrictPolicy()
 
-	splitted := strings.SplitN(m.Content, " ", 2)
+	sanitizeMessage := sanitizer.Sanitize(m.Content)
+	sanitizeMessage = strings.ReplaceAll(sanitizeMessage, ";", "")
+
+	splitted := strings.SplitN(sanitizeMessage, " ", 2)
 
 	// well we need to have a command at least
 	if len(splitted) < 1 {
