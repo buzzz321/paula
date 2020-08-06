@@ -17,9 +17,9 @@ import (
 )
 
 type whatIs struct {
-	who   string
-	what  string
-	entry string
+	whoSet        string
+	whatToExplain string
+	explanation   string
 }
 
 var (
@@ -59,7 +59,7 @@ func setWhatIs(name string, message string) {
 
 func getWhatIs(what string) (whatIs, int) {
 	for index, item := range whatisDb {
-		if item.what == what {
+		if item.whatToExplain == what {
 			return item, index
 		}
 	}
@@ -104,7 +104,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if cmd == "!randwhatis" {
 		whatis := randWhatIs()
 
-		s.ChannelMessageSend(m.ChannelID, whatis.what+" -> "+whatis.entry+"("+whatis.who+")")
+		s.ChannelMessageSend(m.ChannelID, whatis.whatToExplain+" -> "+whatis.explanation+"("+whatis.whoSet+")")
 	}
 
 	if cmd == "!setwhatis" {
@@ -120,7 +120,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 
-		s.ChannelMessageSend(m.ChannelID, whatis.what+" -> "+whatis.entry+"("+whatis.who+")")
+		s.ChannelMessageSend(m.ChannelID, whatis.whatToExplain+" -> "+whatis.explanation+"("+whatis.whoSet+")")
 
 	}
 }
