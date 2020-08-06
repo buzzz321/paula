@@ -7,7 +7,6 @@ import (
 	"math/rand"
 	"os"
 	"os/signal"
-	"strconv"
 	"strings"
 	"sync"
 	"syscall"
@@ -18,6 +17,7 @@ import (
 
 type whatIs struct {
 	whoSet        string
+	date          string
 	whatToExplain string
 	explanation   string
 }
@@ -53,7 +53,8 @@ func setWhatIs(name string, message string) {
 	}
 
 	fmt.Println(splitted[0] + " -> " + splitted[1] + "(" + name + ")")
-	whatisDb = append(whatisDb, whatIs{name, splitted[0], splitted[1]})
+	date := time.Now().String()
+	whatisDb = append(whatisDb, whatIs{name, date, splitted[0], splitted[1]})
 
 }
 
@@ -64,7 +65,7 @@ func getWhatIs(what string) (whatIs, int) {
 		}
 	}
 
-	return whatIs{"", "", ""}, -1
+	return whatIs{"", "", "", ""}, -1
 }
 
 func randWhatIs() whatIs {
@@ -145,7 +146,7 @@ func readWhatis() {
 		whatisPart := strings.Split(line, ";")
 		if len(whatisPart) == 4 {
 			fmt.Println(line)
-			whatisDb = append(whatisDb, whatIs{whatisPart[0], whatisPart[2], whatisPart[3]})
+			whatisDb = append(whatisDb, whatIs{whatisPart[0], whatisPart[1], whatisPart[2], whatisPart[3]})
 		}
 	}
 
