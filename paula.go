@@ -71,9 +71,7 @@ func getWhatIs(what string) (whatIs, int) {
 func randWhatIs() whatIs {
 	mutex.Lock()
 	defer mutex.Unlock()
-	size := len(whatisDb)
 
-	fmt.Println("size:" + strconv.Itoa(size))
 	return whatisDb[rand.Intn(len(whatisDb))]
 }
 
