@@ -55,8 +55,14 @@ func setWhatIs(name string, message string) {
 
 	fmt.Println(splitted[0] + " -> " + splitted[1] + "(" + name + ")")
 	date := time.Now().String()
-	whatisDb = append(whatisDb, whatIs{name, date, splitted[0], splitted[1]})
 
+	for index, item := range whatisDb {
+		if item.whatToExplain == splitted[0] {
+			whatisDb[index] = whatIs{name, date, splitted[0], splitted[1]}
+			return
+		}
+	}
+	whatisDb = append(whatisDb, whatIs{name, date, splitted[0], splitted[1]})
 }
 
 func getWhatIs(what string) (whatIs, int) {
