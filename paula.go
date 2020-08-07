@@ -62,7 +62,9 @@ func setWhatIs(name string, message string) {
 			return
 		}
 	}
-	whatisDb = append(whatisDb, whatIs{name, date, splitted[0], splitted[1]})
+	newWhatis := whatIs{name, date, splitted[0], splitted[1]}
+	whatisDb = append(whatisDb, newWhatis)
+	appendToFile(newWhatis)
 }
 
 func getWhatIs(what string) (whatIs, int) {
@@ -133,6 +135,36 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		s.ChannelMessageSend(m.ChannelID, whatis.whatToExplain+" -> "+whatis.explanation+"("+whatis.whoSet+")")
 
 	}
+}
+
+func appendToFile(item whatIs) {
+
+	outputFile, err := os.OpenFile("whatisdb.txt", os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	defer outputFile.Close()
+
+	fileInfo, err := outputFile.Stat()
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	_, err = outputFile.Seek(fileInfo.Size(), 0)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	writer := bufio.NewWriter(outputFile)
+
+	_, err = fmt.Fprintln(writer, item.whoSet+";"+item.date+";"+item.whatToExplain+";"+item.explanation)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	writer.Flush()
 }
 
 func readWhatis() {
