@@ -146,17 +146,6 @@ func appendToFile(item whatIs) {
 	}
 	defer outputFile.Close()
 
-	fileInfo, err := outputFile.Stat()
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-
-	_, err = outputFile.Seek(fileInfo.Size(), 0)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
 	writer := bufio.NewWriter(outputFile)
 
 	_, err = fmt.Fprintln(writer, item.whoSet+";"+item.date+";"+item.whatToExplain+";"+item.explanation)
