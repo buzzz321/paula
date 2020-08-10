@@ -58,7 +58,9 @@ func setWhatIs(name string, message string) {
 
 	for index, item := range whatisDb {
 		if item.whatToExplain == splitted[0] {
-			whatisDb[index] = whatIs{name, date, splitted[0], splitted[1]}
+			newWhatIs := whatIs{name, date, splitted[0], splitted[1]}
+			whatisDb[index] = newWhatIs
+			saveWhatisFile()
 			return
 		}
 	}
@@ -137,9 +139,31 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 }
 
+func saveWhatisFile() {
+	outFile, err := os.OpenFile("whatisdb.txt", os.O_TRUNC|os.O_WRONLY, 0700)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	defer outFile.Close()
+
+	writer := bufio.NewWriter(outFile)
+
+	for _, item := range whatisDb {
+		_, err = fmt.Fprintln(writer, item.whoSet+";"+item.date+";"+item.whatToExplain+";"+item.explanation)
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+
+		fmt.Println(item.whoSet + ";" + item.date + ";" + item.whatToExplain + ";" + item.explanation)
+	}
+	writer.Flush()
+}
+
 func appendToFile(item whatIs) {
 
-	outputFile, err := os.OpenFile("whatisdb.txt", os.O_APPEND|os.O_WRONLY, 0600)
+	outputFile, err := os.OpenFile("whatisdb.txt", os.O_APPEND|os.O_WRONLY, 0700)
 	if err != nil {
 		log.Fatal(err)
 		return
