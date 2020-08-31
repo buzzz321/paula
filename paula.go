@@ -135,7 +135,14 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 
 		s.ChannelMessageSend(m.ChannelID, whatis.whatToExplain+" -> "+whatis.explanation+"("+whatis.whoSet+")")
-
+	}
+	if cmd == "!help" {
+		text := `
+!randWhatis
+!setwhatis <what to set> <explanation>
+!wnatis <what to explain>
+`
+		s.ChannelMessageSend(m.ChannelID, text)
 	}
 }
 
